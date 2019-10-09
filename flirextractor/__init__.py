@@ -1,0 +1,1 @@
+from .flirextractor import FlirExtractor
