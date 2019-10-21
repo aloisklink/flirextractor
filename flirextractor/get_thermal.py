@@ -11,12 +11,8 @@ from PIL import Image
 
 from exiftool import ExifTool, fsencode
 
-if typing.TYPE_CHECKING:
-    import os
-
 from .raw_temp_to_celcius import raw_temp_to_celcius
-
-Path = typing.Union["os.PathLike", typing.Text]
+from .pathutils import Path, get_str_filepath
 
 def _get_tag_bytes(
     exiftool: ExifTool,
@@ -69,9 +65,9 @@ def convert_image(
 def get_thermal_batch(
     exiftool: ExifTool, filepaths: typing.Iterable[Path],
 ) -> typing.Iterable[np.ndarray]:
-    raw_paths = [str(filepath) for filepath in filepaths]
-    metadata = exiftool.get_tags_batch(exif_var_tags.values(), raw_paths)
-    raw_images = [_get_raw_np(exiftool, filepath) for filepath in raw_paths]
+    str_paths = [get_str_filepath(filepath) for filepath in filepaths]
+    metadata = exiftool.get_tags_batch(exif_var_tags.values(), str_paths)
+    raw_images = [_get_raw_np(exiftool, filepath) for filepath in str_paths]
     return [
         convert_image(image_metadata, raw_image)
         for image_metadata, raw_image in zip(metadata, raw_images)

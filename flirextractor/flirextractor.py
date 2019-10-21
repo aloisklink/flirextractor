@@ -2,7 +2,8 @@ from typing import TYPE_CHECKING, Iterable, Optional
 
 from exiftool import ExifTool
 
-from .get_thermal import Path, get_thermal_batch, get_thermal
+from .get_thermal import get_thermal_batch, get_thermal
+from .pathutils import Path
 
 if TYPE_CHECKING:
     import numpy as np
