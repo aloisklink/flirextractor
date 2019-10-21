@@ -46,9 +46,9 @@ def water_vapor_pressure(temp: float) -> float:
         temp: The temperature in Celcius.
 
     Returns:
-        The saturated water vapour pressure in a mystery unit.
+        The saturated water vapour pressure in mmHg (milimeters of mercury).
     """
-    # eh? what is this?
+    # seems to pretty inaccurate, switch to Goff-Gratch?
     # shouldn't we be using one of these?
     # https://en.wikipedia.org/wiki/Vapour_pressure_of_water
     return math.exp(
