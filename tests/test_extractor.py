@@ -8,6 +8,7 @@ TEST_IMAGE_RELATIVE_PATH = pathlib.Path("./IR_2412.jpg")
 
 TEST_IMAGE_PATH = pathlib.Path(__file__).parent / TEST_IMAGE_RELATIVE_PATH
 
+
 def test_get_thermal():
     with FlirExtractor() as flir_extractor:
         thermal_a = flir_extractor.get_thermal(TEST_IMAGE_PATH)
@@ -25,6 +26,7 @@ def test_get_thermal():
 
         with pytest.raises(IsADirectoryError):
             flir_extractor.get_thermal(pathlib.Path(__file__).parent)
+
 
 def test_get_thermal_batch():
     with FlirExtractor() as flir_extractor:

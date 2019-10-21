@@ -33,10 +33,11 @@ References:
 
 import math
 
-import numpy as np
+import numpy as np  # type: ignore
 
 CELCIUS_KELVIN_DIFF = 273.15
 """Offset between 0 Celcius and 0 Kelvin"""
+
 
 def water_vapor_pressure(temp: float) -> float:
     """Calculates the saturated vapour pressure for a given temperature.
@@ -50,12 +51,17 @@ def water_vapor_pressure(temp: float) -> float:
     # eh? what is this?
     # shouldn't we be using one of these?
     # https://en.wikipedia.org/wiki/Vapour_pressure_of_water
-    return math.exp(math.fsum((
-        1.5587,
-        0.06939*temp,
-        -0.00027816*(temp)**2,
-        0.00000068455*(temp)**3,
-    )))
+    return math.exp(
+        math.fsum(
+            (
+                1.5587,
+                0.06939 * temp,
+                -0.00027816 * (temp) ** 2,
+                0.00000068455 * (temp) ** 3,
+            )
+        )
+    )
+
 
 def raw_temp_to_celcius(
     raw: np.ndarray,
@@ -71,8 +77,8 @@ def raw_temp_to_celcius(
     planck_f: float = 1,
     planck_0: float = -7340,
     planck_r2: float = 0.012545258,
-    *, # kwargs only from now on
-    peak_spectral_sensitivity: float = 9.8e-9, # default is 9.8 μm
+    *,  # kwargs only from now on
+    peak_spectral_sensitivity: float = 9.8e-9,  # default is 9.8 μm
     atmospheric_trans_a1: float = 6.569e-3,
     atmospheric_trans_a2: float = 12.62e-3,
     atmospheric_trans_b1: float = -2.276e-3,
@@ -119,9 +125,9 @@ def raw_temp_to_celcius(
     # Standard equation: temperature<-PB/log(PR1/(PR2*(raw+PO))+PF)-273.15
     # Other source of information:
     # Minkina and Dudzik's Infrared Thermography: Errors and Uncertainties
-    
+
     window_emissivity = 1 - ir_window_transmission
-    window_reflection = 0 # anti-reflective coating on window
+    window_reflection = 0  # anti-reflective coating on window
     water_partial_pressure = humidity * water_vapor_pressure(atmospheric_temp)
 
     # transmission through atmosphere - equations from
@@ -130,64 +136,85 @@ def raw_temp_to_celcius(
     # we assume the thermal window is at the mid-point (OD/2)
     # between the source and the camera sensor
     # TODO: use actual thermal window distance
-    antenuation_b4_window = math.fsum((
-        atmospheric_trans_x * math.exp(
-            -math.sqrt(subject_distance/2) * math.fsum((
-                atmospheric_trans_a1,
-                atmospheric_trans_b1 * math.sqrt(water_partial_pressure),
-            ))
-        ),
-        (1 - atmospheric_trans_x) * math.exp(
-            -math.sqrt(subject_distance/2) * math.fsum((
-                atmospheric_trans_a2,
-                atmospheric_trans_b2 * math.sqrt(water_partial_pressure),
-            ))
-        ),
-    ))
+    antenuation_b4_window = math.fsum(
+        (
+            atmospheric_trans_x
+            * math.exp(
+                -math.sqrt(subject_distance / 2)
+                * math.fsum(
+                    (
+                        atmospheric_trans_a1,
+                        atmospheric_trans_b1
+                        * math.sqrt(water_partial_pressure),
+                    )
+                )
+            ),
+            (1 - atmospheric_trans_x)
+            * math.exp(
+                -math.sqrt(subject_distance / 2)
+                * math.fsum(
+                    (
+                        atmospheric_trans_a2,
+                        atmospheric_trans_b2
+                        * math.sqrt(water_partial_pressure),
+                    )
+                )
+            ),
+        )
+    )
     antenuation_after_window = antenuation_b4_window
 
     def radiance(temperature: float) -> float:
         kelvin = temperature + CELCIUS_KELVIN_DIFF
-        return math.fsum((
-            - planck_0,
-            - planck_r1 / planck_r2 / (math.exp(planck_b / kelvin) - planck_f),
-        ))
+        return math.fsum(
+            (
+                -planck_0,
+                -planck_r1
+                / planck_r2
+                / (math.exp(planck_b / kelvin) - planck_f),
+            )
+        )
 
     divisor = 1.0
     # attenuated radiance reflecting off the object before the window
     divisor *= emissivity
-    reflected_b4_window = (
-        (1 - emissivity) / divisor * radiance(reflected_temp))
+    reflected_b4_window = (1 - emissivity) / divisor * radiance(reflected_temp)
 
     # attenuated radiance from the atmosphere (before the window)
     divisor *= antenuation_b4_window
     atmosphere_b4_window = (
-        (1 - antenuation_b4_window)/divisor * radiance(atmospheric_temp)
+        (1 - antenuation_b4_window) / divisor * radiance(atmospheric_temp)
     )
     # attenuated radiance from the window
     divisor *= ir_window_transmission
-    radiance_window = window_emissivity/divisor * radiance(ir_window_temp)
+    radiance_window = window_emissivity / divisor * radiance(ir_window_temp)
 
     # attenuated reflection from the window
     reflected_after_window = (
-        window_reflection/divisor * radiance(reflected_temp)
+        window_reflection / divisor * radiance(reflected_temp)
     )
 
     # attenuated radiance from the atmosphere (after the window)
     divisor *= antenuation_after_window
     atmosphere_after_window = (
-        (1 - antenuation_after_window)/divisor * radiance(atmospheric_temp)
+        (1 - antenuation_after_window) / divisor * radiance(atmospheric_temp)
     )
 
-    non_object_radiance = math.fsum((
-        reflected_b4_window, atmosphere_b4_window, radiance_window,
-        reflected_after_window, atmosphere_after_window))
+    non_object_radiance = math.fsum(
+        (
+            reflected_b4_window,
+            atmosphere_b4_window,
+            radiance_window,
+            reflected_after_window,
+            atmosphere_after_window,
+        )
+    )
 
-    raw_object_radiance = raw/divisor - non_object_radiance
+    raw_object_radiance = raw / divisor - non_object_radiance
 
-    raw_object_temperature_k = planck_b / np.log(np.sum(
-            planck_r1/planck_r2/(raw_object_radiance + planck_0),
-            planck_f,
+    raw_object_temperature_k = planck_b / np.log(
+        np.sum(
+            planck_r1 / planck_r2 / (raw_object_radiance + planck_0), planck_f
         )
     )
     raw_object_temperature_c = raw_object_temperature_k - CELCIUS_KELVIN_DIFF

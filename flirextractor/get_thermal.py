@@ -6,18 +6,17 @@ https://github.com/gtatters/Thermimage/blob/master/R/raw2temp.R
 import typing
 import io
 
-import numpy as np
-from PIL import Image
+import numpy as np  # type: ignore
+from PIL import Image  # type: ignore
 
-from exiftool import ExifTool, fsencode
+from exiftool import ExifTool, fsencode  # type: ignore
 
 from .raw_temp_to_celcius import raw_temp_to_celcius
 from .pathutils import Path, get_str_filepath
 
+
 def _get_tag_bytes(
-    exiftool: ExifTool,
-    tag: typing.Text,
-    filepath: Path,
+    exiftool: ExifTool, tag: typing.Text, filepath: Path
 ) -> bytes:
     """Gets the data of a tag in a file in bytes using exiftool.
 
@@ -35,6 +34,7 @@ def _get_tag_bytes(
     params = ["-b", f"-{tag}", str(filepath)]
     params_as_bytes = map(fsencode, params)
     return exiftool.execute(*params_as_bytes)
+
 
 def _get_raw_np(exiftool: ExifTool, filepath: Path) -> np.ndarray:
     """Gets the raw thermal data from a FLIR image.
@@ -55,6 +55,7 @@ def _get_raw_np(exiftool: ExifTool, filepath: Path) -> np.ndarray:
     image = Image.open(fp)
     return np.array(image)
 
+
 def get_thermal(exiftool: ExifTool, filepath: Path) -> np.ndarray:
     """Loads the thermal image from a single FLIR image.
 
@@ -74,26 +75,26 @@ def get_thermal(exiftool: ExifTool, filepath: Path) -> np.ndarray:
 
 
 exif_var_tags = dict(
-    emissivity = "Emissivity",
-    subject_distance = "SubjectDistance",
-    reflected_temp = "ReflectedApparentTemperature",
-    atmospheric_temp = "AtmosphericTemperature",
-    ir_window_temp = "IRWindowTemperature",
-    ir_window_transmission = "IRWindowTransmission",
-    humidity = "RelativeHumidity",
-    planck_r1 = "PlanckR1",
-    planck_b = "PlanckB",
-    planck_f = "PlanckF",
-    planck_0 = "PlanckO",
-    planck_r2 = "PlanckR2",
+    emissivity="Emissivity",
+    subject_distance="SubjectDistance",
+    reflected_temp="ReflectedApparentTemperature",
+    atmospheric_temp="AtmosphericTemperature",
+    ir_window_temp="IRWindowTemperature",
+    ir_window_transmission="IRWindowTransmission",
+    humidity="RelativeHumidity",
+    planck_r1="PlanckR1",
+    planck_b="PlanckB",
+    planck_f="PlanckF",
+    planck_0="PlanckO",
+    planck_r2="PlanckR2",
 )
 """A mapping of Python variable names to EXIF metadata tag name"""
 _inv_exif_var_tags = {exif: py for py, exif in exif_var_tags.items()}
 """A reverse mapping of exif_var_tags"""
 
+
 def convert_image(
-    metadata: typing.Mapping[typing.Text, typing.Text],
-    raw_np: np.ndarray,
+    metadata: typing.Mapping[typing.Text, typing.Text], raw_np: np.ndarray
 ) -> np.ndarray:
     """Converts raw FLIR thermal data into Celcius using metadata.
 
@@ -112,8 +113,9 @@ def convert_image(
     }
     return raw_temp_to_celcius(raw_np, **converted_metadata)
 
+
 def get_thermal_batch(
-    exiftool: ExifTool, filepaths: typing.Iterable[Path],
+    exiftool: ExifTool, filepaths: typing.Iterable[Path]
 ) -> typing.Iterable[np.ndarray]:
     """Loads the thermal images from multiple FLIR images.
 

@@ -1,12 +1,14 @@
 from typing import TYPE_CHECKING, Iterable, Optional
 
-import exiftool
+from exiftool import ExifTool  # type: ignore
+from exiftool import executable as exiftool_default_exe  # type: ignore
 
 from .get_thermal import get_thermal_batch, get_thermal
 from .pathutils import Path
 
 if TYPE_CHECKING:
-    import numpy as np
+    import numpy as np  # type: ignore
+
 
 class FlirExtractor:
     """Extracts thermal data from FLIR images using ExifTool.
@@ -23,22 +25,24 @@ class FlirExtractor:
                 ["./FLIR1.jpg", "./FLIR2.jpg"]
             )
     """
-    exiftoolpath: Optional[Path]
-    _exiftool: Optional[exiftool.ExifTool]
 
-    def __init__(self, exiftoolpath: Path = exiftool.executable):
+    exiftoolpath: Optional[Path]
+    _exiftool: Optional[ExifTool]
+
+    def __init__(self, exiftoolpath: Path = exiftool_default_exe):
         self.exiftoolpath = exiftoolpath
         self._exiftool = None
 
     @property
-    def exiftool(self) -> exiftool.ExifTool:
+    def exiftool(self) -> ExifTool:
         _exiftool = self._exiftool
         if _exiftool is None:
             raise AttributeError(
                 "ExifTool was not initialized. "
                 "Use FlirExtractor in a context manager, e.g. \n"
                 "with FlirExtractor() as e:\n"
-                "    e.do_magic()")
+                "    e.do_magic()"
+            )
         return _exiftool
 
     def open(self):
@@ -48,7 +52,7 @@ class FlirExtractor:
         """
         if self._exiftool is not None:
             raise Exception("ExifTool was already initialized.")
-        self._exiftool = exiftool.ExifTool(executable_=str(self.exiftoolpath))
+        self._exiftool = ExifTool(executable_=str(self.exiftoolpath))
         self._exiftool.start()
 
     def close(self):
@@ -57,7 +61,7 @@ class FlirExtractor:
         Not recommended, use `with:` context manager instead.
         """
         if self._exiftool is None:
-            return # already closed, do nothing
+            return  # already closed, do nothing
         self._exiftool.terminate()
         self._exiftool = None
 
@@ -80,7 +84,8 @@ class FlirExtractor:
         return get_thermal(self.exiftool, filepath)
 
     def get_thermal_batch(
-        self, filepaths: Iterable[Path]) -> Iterable["np.ndarray"]:
+        self, filepaths: Iterable[Path]
+    ) -> Iterable["np.ndarray"]:
         """Gets thermal images from a list of FLIR files.
 
         Parameters:
