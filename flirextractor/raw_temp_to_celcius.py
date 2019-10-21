@@ -5,7 +5,7 @@ Adapted from Glenn J. Tattersall's Thermimage program in R:
 GPL-3.0.
 
 License:
-    Modifications have Copyright (C) 2019 Alois Klink
+    Python port has Copyright (C) 2019 Alois Klink
 
     Original work Copyright (C) 2017 Glenn J Tattersall
 
@@ -22,8 +22,14 @@ License:
 
     You should have received a copy of the GNU General Public License along
     with this program. If not, see <https://www.gnu.org/licenses/>.
-"""
 
+References:
+    Glenn J. Tattersall. (2017, December 3).
+    Thermimage: Thermal Image Analysis.
+    doi:
+    10.5281/zenodo.1069704 (URL: http://doi.org/10.5281/zenodo.1069704),
+    R package, <URL: https://CRAN.R-project.org/package=Thermimage>.
+"""
 
 import math
 
@@ -103,13 +109,6 @@ def raw_temp_to_celcius(
     Returns:
         A 2D array of the image, with each pixel showing the temperature
         in Celcius.
-
-    References:
-        Glenn J. Tattersall. (2017, December 3).
-        Thermimage: Thermal Image Analysis.
-        doi:
-        10.5281/zenodo.1069704 (URL: http://doi.org/10.5281/zenodo.1069704),
-        R package, <URL: https://CRAN.R-project.org/package=Thermimage>.
     """
     if atmospheric_temp is None:
         atmospheric_temp = reflected_temp
