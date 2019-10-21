@@ -69,7 +69,9 @@ def get_thermal(exiftool: ExifTool, filepath: Path) -> np.ndarray:
         The thermal data in Celcius as a 2-D numpy array.
     """
     filepaths = (filepath,)
-    return get_thermal_batch(exiftool, filepaths)[0]
+    # get first result from get_thermal_batch
+    return next(iter(get_thermal_batch(exiftool, filepaths)))
+
 
 exif_var_tags = dict(
     emissivity = "Emissivity",
