@@ -4,7 +4,8 @@ import pytest
 import numpy as np
 
 from flirextractor.raw_temp_to_celcius import (
-    water_vapor_pressure, raw_temp_to_celcius
+    water_vapor_pressure,
+    raw_temp_to_celcius,
 )
 
 temp_to_pressure = {
@@ -62,22 +63,27 @@ expected_raw_temp_to_celcius = {
     RawTempToCelciusInputVars(
         raw=18090,
         **{
-            'emissivity': 0.949999988079071, 'subject_distance': 1.0,
-            'reflected_temp': 19.9999938964844,
-            'atmospheric_temp': 19.9999938964844,
-            'ir_window_temp': 19.9999938964844,
-            'ir_window_transmission': 1.0, 'humidity': 0.5,
-            'planck_r1': 21106.76953125, 'planck_b': 1501.0,
-            'planck_f': 1.0, 'planck_0': -7340.0,
-            'planck_r2': 0.012545257806778,
-            'peak_spectral_sensitivity': 9.58537741505663,
-        }
-    ): 23.73440586671677,
+            "emissivity": 0.949999988079071,
+            "subject_distance": 1.0,
+            "reflected_temp": 19.9999938964844,
+            "atmospheric_temp": 19.9999938964844,
+            "ir_window_temp": 19.9999938964844,
+            "ir_window_transmission": 1.0,
+            "humidity": 0.5,
+            "planck_r1": 21106.76953125,
+            "planck_b": 1501.0,
+            "planck_f": 1.0,
+            "planck_0": -7340.0,
+            "planck_r2": 0.012545257806778,
+            "peak_spectral_sensitivity": 9.58537741505663,
+        },
+    ): 23.73440586671677
 }
 
 
-@pytest.mark.parametrize("input_vals, expected_output_val",
-                         expected_raw_temp_to_celcius.items())
+@pytest.mark.parametrize(
+    "input_vals, expected_output_val", expected_raw_temp_to_celcius.items()
+)
 def test_raw_temp_to_celcius(input_vals, expected_output_val):
 
     input_vals = input_vals._replace(raw=np.array([input_vals.raw]))

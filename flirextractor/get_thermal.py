@@ -98,8 +98,10 @@ def convert_exif_tag_to_py(full_exif_tag: str) -> str:
     for substr_exif_tag in _inv_exif_var_tags:
         if substr_exif_tag in full_exif_tag:
             return _inv_exif_var_tags[substr_exif_tag]
-    raise KeyError(f"Could not find exif_tag {full_exif_tag} "
-                   f"in {_inv_exif_var_tags.keys()}.")
+    raise KeyError(
+        f"Could not find exif_tag {full_exif_tag} "
+        f"in {_inv_exif_var_tags.keys()}."
+    )
 
 
 def convert_image(

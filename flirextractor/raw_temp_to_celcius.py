@@ -73,8 +73,11 @@ class ATMOSPHERIC_ATTENUATION_CONSTANTS(enum.Enum):
 
 
 def atmosphere_attenuation(
-    relative_humidity: float, temperature: float, altitude: float,
-    distance: float, peak_spectral_wavelength: float,
+    relative_humidity: float,
+    temperature: float,
+    altitude: float,
+    distance: float,
+    peak_spectral_wavelength: float,
 ) -> float:
     """Calculates the attenuation of the IR signal in atmosphere.
 
@@ -101,20 +104,22 @@ def atmosphere_attenuation(
 
     def exponential_term(alpha, beta):
         sqrt_water_pressure = math.sqrt(water_partial_pressure)
-        return (
-            -math.sqrt(distance) * (alpha + beta * sqrt_water_pressure)
-        )
+        return -math.sqrt(distance) * (alpha + beta * sqrt_water_pressure)
 
     exponential_1 = exponential_term(
-            alpha=ATMOSPHERIC_ATTENUATION_CONSTANTS.A1.value,
-            beta=ATMOSPHERIC_ATTENUATION_CONSTANTS.B1.value,
-        )
+        alpha=ATMOSPHERIC_ATTENUATION_CONSTANTS.A1.value,
+        beta=ATMOSPHERIC_ATTENUATION_CONSTANTS.B1.value,
+    )
     exponential_2 = exponential_term(
-            alpha=ATMOSPHERIC_ATTENUATION_CONSTANTS.A2.value,
-            beta=ATMOSPHERIC_ATTENUATION_CONSTANTS.B2.value,
-        )
-    part_1 = ATMOSPHERIC_ATTENUATION_CONSTANTS.X.value * math.exp(exponential_1)
-    part_2 = (1 - ATMOSPHERIC_ATTENUATION_CONSTANTS.X.value) * math.exp(exponential_2)
+        alpha=ATMOSPHERIC_ATTENUATION_CONSTANTS.A2.value,
+        beta=ATMOSPHERIC_ATTENUATION_CONSTANTS.B2.value,
+    )
+    part_1 = ATMOSPHERIC_ATTENUATION_CONSTANTS.X.value * math.exp(
+        exponential_1
+    )
+    part_2 = (1 - ATMOSPHERIC_ATTENUATION_CONSTANTS.X.value) * math.exp(
+        exponential_2
+    )
     return part_1 + part_2
 
 
@@ -179,7 +184,7 @@ def raw_temp_to_celcius(
     # we assume the thermal window is at the mid-point (OD/2)
     # between the source and the camera sensor
     # TODO: use actual thermal window distance
-    subject_distance_to_window = subject_distance/2
+    subject_distance_to_window = subject_distance / 2
     sensor_distance_to_window = subject_distance - subject_distance_to_window
 
     antenuation_b4_window = atmosphere_attenuation(
@@ -187,14 +192,16 @@ def raw_temp_to_celcius(
         temperature=atmospheric_temp,
         altitude=0,
         distance=subject_distance_to_window,
-        peak_spectral_wavelength=peak_spectral_sensitivity)
+        peak_spectral_wavelength=peak_spectral_sensitivity,
+    )
 
     antenuation_after_window = atmosphere_attenuation(
         relative_humidity=humidity,
         temperature=atmospheric_temp,
         altitude=0,
         distance=sensor_distance_to_window,
-        peak_spectral_wavelength=peak_spectral_sensitivity)
+        peak_spectral_wavelength=peak_spectral_sensitivity,
+    )
 
     def radiance(temperature: float) -> float:
         kelvin = temperature + CELCIUS_KELVIN_DIFF
@@ -239,7 +246,7 @@ def raw_temp_to_celcius(
     raw_obj_radiance = raw / divisor - non_object_radiance
 
     raw_object_temperature_k = planck_b / np.log(
-            planck_r1 / planck_r2 / (raw_obj_radiance + planck_0) + planck_f
+        planck_r1 / planck_r2 / (raw_obj_radiance + planck_0) + planck_f
     )
     raw_object_temperature_c = raw_object_temperature_k - CELCIUS_KELVIN_DIFF
     return raw_object_temperature_c
