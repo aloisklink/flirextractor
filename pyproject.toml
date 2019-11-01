@@ -23,7 +23,7 @@ numpy = "^1.17"
 
 [tool.poetry.dev-dependencies]
 black = {git = "https://github.com/psf/black.git", tag = "19.3b0"}
-mypy = "^0.730.0"
+mypy = "^0.740.0"
 flake8 = "^3.7"
 pytest = "^5.2"
 
