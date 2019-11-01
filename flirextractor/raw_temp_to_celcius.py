@@ -32,6 +32,7 @@ References:
 """
 
 import math
+import enum
 
 import numpy as np  # type: ignore
 
@@ -56,11 +57,65 @@ def water_vapor_pressure(temp: float) -> float:
             (
                 1.5587,
                 0.06939 * temp,
-                -0.00027816 * (temp) ** 2,
-                0.00000068455 * (temp) ** 3,
+                -0.00027816 * (temp ** 2),
+                0.00000068455 * (temp ** 3),
             )
         )
     )
+
+
+class ATMOSPHERIC_ATTENUATION_CONSTANTS(enum.Enum):
+    A1 = 6.569e-3
+    A2 = 12.62e-3
+    B1 = -2.276e-3
+    B2 = -6.67e-3
+    X = 1.9
+
+
+def atmosphere_attenuation(
+    relative_humidity: float, temperature: float, altitude: float,
+    distance: float, peak_spectral_wavelength: float,
+) -> float:
+    """Calculates the attenuation of the IR signal in atmosphere.
+
+    Parameters:
+        relative_humidity: The relative humidity between 0 and 1.
+        temperature: The temperature of the atmosphere in Celcius.
+        altitude: The altitude in meters above sea level (unused).
+        distance: The distance the signal moves in the atmosphere in meters.
+        peak_spectral_wavelength:
+            The wavelength of the peak spectral power in meters (unused).
+
+    References:
+        Sebastian Dudzik and Waldemar Minkina's
+        Infrared Thermography: Errors and Uncertainties
+    """
+    if not 0 <= relative_humidity <= 1:
+        raise ValueError("Relative humidity should be between 0 and 1")
+
+    # TODO: Replace this mystery code with something from
+    # http://www.control.isy.liu.se/student/exjobb/xfiles/1909.pdf
+
+    water_saturated_pressure = water_vapor_pressure(temperature)
+    water_partial_pressure = relative_humidity * water_saturated_pressure
+
+    def exponential_term(alpha, beta):
+        sqrt_water_pressure = math.sqrt(water_partial_pressure)
+        return (
+            -math.sqrt(distance) * (alpha + beta * sqrt_water_pressure)
+        )
+
+    exponential_1 = exponential_term(
+            alpha=ATMOSPHERIC_ATTENUATION_CONSTANTS.A1.value,
+            beta=ATMOSPHERIC_ATTENUATION_CONSTANTS.B1.value,
+        )
+    exponential_2 = exponential_term(
+            alpha=ATMOSPHERIC_ATTENUATION_CONSTANTS.A2.value,
+            beta=ATMOSPHERIC_ATTENUATION_CONSTANTS.B2.value,
+        )
+    part_1 = ATMOSPHERIC_ATTENUATION_CONSTANTS.X.value * math.exp(exponential_1)
+    part_2 = (1 - ATMOSPHERIC_ATTENUATION_CONSTANTS.X.value) * math.exp(exponential_2)
+    return part_1 + part_2
 
 
 def raw_temp_to_celcius(
@@ -78,12 +133,7 @@ def raw_temp_to_celcius(
     planck_0: float = -7340,
     planck_r2: float = 0.012545258,
     *,  # kwargs only from now on
-    peak_spectral_sensitivity: float = 9.8e-9,  # default is 9.8 μm
-    atmospheric_trans_a1: float = 6.569e-3,
-    atmospheric_trans_a2: float = 12.62e-3,
-    atmospheric_trans_b1: float = -2.276e-3,
-    atmospheric_trans_b2: float = -6.67e-3,
-    atmospheric_trans_x: float = -1.9,
+    peak_spectral_sensitivity: float = 9.8,  # default is 9.8 μm
 ) -> np.ndarray:
     """Loads temperature data from raw FLIR ADC data into Celcius.
 
@@ -105,12 +155,8 @@ def raw_temp_to_celcius(
         planck_f: calibration constant
         planck_0: calibration constant
         planck_r2: calibration constant
-        peak_spectral_sensitivity: wavelength of highest sensitivity in meters
-        atmospheric_trans_a1: constant for calculating humidity
-        atmospheric_trans_a2: constant for calculating humidity
-        atmospheric_trans_b1: constant for calculating humidity
-        atmospheric_trans_b2: constant for calculating humidity
-        atmospheric_trans_x: constant for calculating humidity
+        peak_spectral_sensitivity:
+            wavelength of highest sensitivity in micrometers
 
     Returns:
         A 2D array of the image, with each pixel showing the temperature
@@ -128,52 +174,32 @@ def raw_temp_to_celcius(
 
     window_emissivity = 1 - ir_window_transmission
     window_reflection = 0  # anti-reflective coating on window
-    water_partial_pressure = humidity * water_vapor_pressure(atmospheric_temp)
 
-    # transmission through atmosphere - equations from
-    # Minkina and Dudzik's Infrared Thermography Book
     # Note: for this script,
     # we assume the thermal window is at the mid-point (OD/2)
     # between the source and the camera sensor
     # TODO: use actual thermal window distance
-    antenuation_b4_window = math.fsum(
-        (
-            atmospheric_trans_x
-            * math.exp(
-                -math.sqrt(subject_distance / 2)
-                * math.fsum(
-                    (
-                        atmospheric_trans_a1,
-                        atmospheric_trans_b1
-                        * math.sqrt(water_partial_pressure),
-                    )
-                )
-            ),
-            (1 - atmospheric_trans_x)
-            * math.exp(
-                -math.sqrt(subject_distance / 2)
-                * math.fsum(
-                    (
-                        atmospheric_trans_a2,
-                        atmospheric_trans_b2
-                        * math.sqrt(water_partial_pressure),
-                    )
-                )
-            ),
-        )
-    )
-    antenuation_after_window = antenuation_b4_window
+    subject_distance_to_window = subject_distance/2
+    sensor_distance_to_window = subject_distance - subject_distance_to_window
+
+    antenuation_b4_window = atmosphere_attenuation(
+        relative_humidity=humidity,
+        temperature=atmospheric_temp,
+        altitude=0,
+        distance=subject_distance_to_window,
+        peak_spectral_wavelength=peak_spectral_sensitivity)
+
+    antenuation_after_window = atmosphere_attenuation(
+        relative_humidity=humidity,
+        temperature=atmospheric_temp,
+        altitude=0,
+        distance=sensor_distance_to_window,
+        peak_spectral_wavelength=peak_spectral_sensitivity)
 
     def radiance(temperature: float) -> float:
         kelvin = temperature + CELCIUS_KELVIN_DIFF
-        return math.fsum(
-            (
-                -planck_0,
-                -planck_r1
-                / planck_r2
-                / (math.exp(planck_b / kelvin) - planck_f),
-            )
-        )
+        denominator = planck_r2 * (math.exp(planck_b / kelvin) - planck_f)
+        return planck_r1 / denominator - planck_0
 
     divisor = 1.0
     # attenuated radiance reflecting off the object before the window
@@ -210,12 +236,10 @@ def raw_temp_to_celcius(
         )
     )
 
-    raw_object_radiance = raw / divisor - non_object_radiance
+    raw_obj_radiance = raw / divisor - non_object_radiance
 
     raw_object_temperature_k = planck_b / np.log(
-        np.sum(
-            planck_r1 / planck_r2 / (raw_object_radiance + planck_0), planck_f
-        )
+            planck_r1 / planck_r2 / (raw_obj_radiance + planck_0) + planck_f
     )
     raw_object_temperature_c = raw_object_temperature_k - CELCIUS_KELVIN_DIFF
     return raw_object_temperature_c

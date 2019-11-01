@@ -87,10 +87,19 @@ exif_var_tags = dict(
     planck_f="PlanckF",
     planck_0="PlanckO",
     planck_r2="PlanckR2",
+    peak_spectral_sensitivity="PeakSpectralSensitivity",
 )
 """A mapping of Python variable names to EXIF metadata tag name"""
 _inv_exif_var_tags = {exif: py for py, exif in exif_var_tags.items()}
 """A reverse mapping of exif_var_tags"""
+
+
+def convert_exif_tag_to_py(full_exif_tag: str) -> str:
+    for substr_exif_tag in _inv_exif_var_tags:
+        if substr_exif_tag in full_exif_tag:
+            return _inv_exif_var_tags[substr_exif_tag]
+    raise KeyError(f"Could not find exif_tag {full_exif_tag} "
+                   f"in {_inv_exif_var_tags.keys()}.")
 
 
 def convert_image(
@@ -107,9 +116,9 @@ def convert_image(
     """
     converted_metadata = {
         # convert {EXIFNAME: val} to {python_name: val}
-        _inv_exif_var_tags[mdname]: float(val)
+        convert_exif_tag_to_py(mdname): val
         for mdname, val in metadata.items()
-        if mdname in _inv_exif_var_tags
+        if mdname != "SourceFile"  # exiftool also returns this for some reason
     }
     return raw_temp_to_celcius(raw_np, **converted_metadata)
 
