@@ -1,5 +1,8 @@
 # flirextractor
 
+![PyPI](https://img.shields.io/pypi/v/flirextractor)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/flirextractor)
+
 A library from extracting temperature values from FLIR IRT Images.
 
 ## Differences from existing libraries
