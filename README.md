@@ -34,6 +34,12 @@ On RHEL, this can be installed via:
 sudo yum install perl-Image-ExifTool
 ```
 
+On debian, this can be installed via:
+
+```bash
+sudo apt update && sudo apt install libimage-exiftool-perl -y
+```
+
 ## Usage
 
 Data is loaded in Celcius as 2-dimensional
