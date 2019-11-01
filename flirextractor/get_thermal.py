@@ -103,7 +103,7 @@ def convert_exif_tag_to_py(full_exif_tag: str) -> str:
 
 
 def convert_image(
-    metadata: typing.Mapping[typing.Text, typing.Text], raw_np: np.ndarray
+    metadata: typing.Mapping[typing.Text, typing.Any], raw_np: np.ndarray
 ) -> np.ndarray:
     """Converts raw FLIR thermal data into Celcius using metadata.
 
@@ -116,7 +116,7 @@ def convert_image(
     """
     converted_metadata = {
         # convert {EXIFNAME: val} to {python_name: val}
-        convert_exif_tag_to_py(mdname): val
+        convert_exif_tag_to_py(mdname): float(val)  # should already be float
         for mdname, val in metadata.items()
         if mdname != "SourceFile"  # exiftool also returns this for some reason
     }
