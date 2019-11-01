@@ -80,11 +80,11 @@ poetry run mypy -p flirextractor
 Run black to auto-format code:
 
 ```bash
-poetry run black . -l 79 # line length of 79 chars
+poetry run black .
 ```
 
 And run flake8 to test for anything black missed:
 
 ```bash
-poetry run flake8 tests/ flirextractor
+poetry run flake8 tests/ flirextractor/
 ```
