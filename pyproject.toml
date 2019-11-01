@@ -11,8 +11,8 @@ readme = "README.md"
 repository = "https://github.com/aloisklink/flirextractor"
 homepage = "https://github.com/aloisklink/flirextractor"
 classifiers = [
-    "INTENDED AUDIENCE :: SCIENCE/RESEARCH",
-    "TOPIC :: MULTIMEDIA :: GRAPHICS :: CAPTURE :: DIGITAL CAMERA",
+    "Intended Audience :: Science/Research",
+    "Topic :: Multimedia :: Graphics :: Capture :: Digital Camera",
 ]
 
 [tool.poetry.dependencies]
