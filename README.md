@@ -40,7 +40,7 @@ On RHEL, this can be installed via:
 sudo yum install perl-Image-ExifTool
 ```
 
-On debian, this can be installed via:
+On Debian, this can be installed via:
 
 ```bash
 sudo apt update && sudo apt install libimage-exiftool-perl -y
@@ -48,7 +48,7 @@ sudo apt update && sudo apt install libimage-exiftool-perl -y
 
 ## Usage
 
-Data is loaded in Celcius as 2-dimensional
+Data is loaded in Celsius as 2-dimensional
 [`numpy.ndarray`s](https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html).
 
 To load data from a single FLIR file, run:
@@ -71,7 +71,7 @@ with FlirExtractor() as extractor:
 
 ## Testing
 
-Use the Python package manager `poetry` to install test dependecies:
+Use the Python package manager `poetry` to install test dependencies:
 
 ```bash
 poetry install
