@@ -6,7 +6,7 @@
 <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 </p>
 
-A library from extracting temperature values from FLIR IRT Images.
+An efficient GPLv3 Python package for extracting temperature data from FLIR IRT images.
 
 ## Differences from existing libraries
 
