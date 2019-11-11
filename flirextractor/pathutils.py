@@ -1,5 +1,5 @@
-import typing
 import pathlib
+import typing
 
 if typing.TYPE_CHECKING:
     import os  # noqa: F401, seems to be an issue with pyflake

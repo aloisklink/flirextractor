@@ -3,16 +3,15 @@
 This is based of the algorithm used in
 https://github.com/gtatters/Thermimage/blob/master/R/raw2temp.R
 """
-import typing
 import io
+import typing
 
 import numpy as np  # type: ignore
+from exiftool import ExifTool, fsencode  # type: ignore
 from PIL import Image  # type: ignore
 
-from exiftool import ExifTool, fsencode  # type: ignore
-
-from .raw_temp_to_celcius import raw_temp_to_celcius
 from .pathutils import Path, get_str_filepath
+from .raw_temp_to_celcius import raw_temp_to_celcius
 
 
 def _get_tag_bytes(
@@ -34,6 +33,7 @@ def _get_tag_bytes(
     params = ["-b", f"-{tag}", str(filepath)]
     params_as_bytes = map(fsencode, params)
     return exiftool.execute(*params_as_bytes)
+
 
 def _get_raw_np(exiftool: ExifTool, filepath: Path) -> np.ndarray:
     """Gets the raw thermal data from a FLIR image.

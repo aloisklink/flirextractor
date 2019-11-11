@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Iterable, Optional
 from exiftool import ExifTool  # type: ignore
 from exiftool import executable as exiftool_default_exe  # type: ignore
 
-from .get_thermal import get_thermal_batch, get_thermal
+from .get_thermal import get_thermal, get_thermal_batch
 from .pathutils import Path
 
 if TYPE_CHECKING:

@@ -31,8 +31,8 @@ References:
     R package, <URL: https://CRAN.R-project.org/package=Thermimage>.
 """
 
-import math
 import enum
+import math
 
 import numpy as np  # type: ignore
 

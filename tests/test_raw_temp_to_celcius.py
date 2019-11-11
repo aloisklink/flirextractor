@@ -1,11 +1,10 @@
 import typing
 
-import pytest
 import numpy as np
-
+import pytest
 from flirextractor.raw_temp_to_celcius import (
-    water_vapor_pressure,
     raw_temp_to_celcius,
+    water_vapor_pressure,
 )
 
 temp_to_pressure = {
