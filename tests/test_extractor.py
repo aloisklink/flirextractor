@@ -1,21 +1,42 @@
 import pathlib
+from typing import NamedTuple, Tuple
 
+import numpy as np
 import pytest
-
 from flirextractor import FlirExtractor
 
-TEST_IMAGE_RELATIVE_PATH = pathlib.Path("./IR_2412.jpg")
 
-TEST_IMAGE_PATH = pathlib.Path(__file__).parent / TEST_IMAGE_RELATIVE_PATH
+class Image(NamedTuple):
+    path: str
+    shape: Tuple[int, int]
 
 
-def test_get_thermal():
+class AbsImage(NamedTuple):
+    path: pathlib.Path
+    shape: Tuple[int, int]
+
+
+TEST_IMAGES = [Image("./IR_2412.jpg", (480, 640))]
+
+
+@pytest.fixture(scope="module", params=TEST_IMAGES)
+def image(request) -> AbsImage:
+    test_image = request.param
+    absolute_path = pathlib.Path(__file__).parent / test_image.path
+    vals = test_image._asdict()
+    vals["path"] = absolute_path
+    return AbsImage(**vals)
+
+
+def test_get_thermal(image: AbsImage):
     with FlirExtractor() as flir_extractor:
-        thermal_a = flir_extractor.get_thermal(TEST_IMAGE_PATH)
+        thermal_a = flir_extractor.get_thermal(image.path)
         # should work when loading a str variable
-        thermal_b = flir_extractor.get_thermal(str(TEST_IMAGE_PATH))
+        thermal_b = flir_extractor.get_thermal(str(image.path))
         # loading the same file twice should get the same result
-        assert (thermal_a == thermal_b).all()
+        assert np.allclose(thermal_a, thermal_b, equal_nan=True)
+
+        assert thermal_a.shape == image.shape
 
         with pytest.raises(TypeError):
             # should raise typeError with incorrect type
@@ -28,8 +49,6 @@ def test_get_thermal():
             flir_extractor.get_thermal(pathlib.Path(__file__).parent)
 
 
-def test_get_thermal_batch():
+def test_get_thermal_batch(image: AbsImage):
     with FlirExtractor() as flir_extractor:
-        flir_extractor.get_thermal_batch(
-            (TEST_IMAGE_PATH, str(TEST_IMAGE_PATH))
-        )
+        flir_extractor.get_thermal_batch((image.path, str(image.path)))
