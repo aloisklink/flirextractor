@@ -84,26 +84,8 @@ Then run pytest to run tests.
 poetry run pytest
 ```
 
-Run mypy to run type tests:
+You can run linters with pre-commit:
 
 ```bash
-poetry run -- mypy -p flirextractor
-```
-
-Run isort to sort imports:
-
-```bash
-poetry run isort **/*.py
-```
-
-Run black to auto-format code:
-
-```bash
-poetry run black .
-```
-
-And run flake8 to test for anything black missed:
-
-```bash
-poetry run flake8 tests/ flirextractor/
+poetry run pre-commit run --all-files
 ```
