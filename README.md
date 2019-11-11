@@ -90,6 +90,12 @@ Run mypy to run type tests:
 poetry run mypy -p flirextractor
 ```
 
+Run isort to sort imports:
+
+```bash
+poetry run isort **/*.py
+```
+
 Run black to auto-format code:
 
 ```bash

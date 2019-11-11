@@ -21,6 +21,9 @@ jobs:
         python -m pip install --upgrade poetry
         python -m poetry install
         sudo apt-get update -qq && sudo apt-get install -qq libimage-exiftool-perl
+    - name: Lint with isort
+      run: |
+        python -m poetry run isort --check-only **/*.py
     - name: Lint with flake8
       run: |
         python -m poetry run flake8 tests/ flirextractor/ --statistics
