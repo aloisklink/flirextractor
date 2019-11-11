@@ -16,7 +16,7 @@ jobs:
         python -m pip install --upgrade pre-commit
     - name: Lint using pre-commit
       run: |
-        python -m pre-commit run --all-files
+        pre-commit run --all-files
 
   test:
     runs-on: ubuntu-latest
