@@ -35,7 +35,6 @@ def _get_tag_bytes(
     params_as_bytes = map(fsencode, params)
     return exiftool.execute(*params_as_bytes)
 
-
 def _get_raw_np(exiftool: ExifTool, filepath: Path) -> np.ndarray:
     """Gets the raw thermal data from a FLIR image.
 
@@ -53,7 +52,11 @@ def _get_raw_np(exiftool: ExifTool, filepath: Path) -> np.ndarray:
     # we can't use Image.frombytes(), since bytes is not just the pixel data
     fp = io.BytesIO(raw_image_bytes)
     image = Image.open(fp)
-    return np.array(image)
+    as_array = np.array(image)
+    if image.format == "PNG":
+        # bug in FLIR cameras -> they sometimes save in little-endian format
+        as_array = as_array.astype("uint16").newbyteorder()
+    return as_array
 
 
 def get_thermal(exiftool: ExifTool, filepath: Path) -> np.ndarray:
