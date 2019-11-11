@@ -7,7 +7,7 @@
 <a href="https://github.com/aloisklink/flirextractor/blob/master/LICENSE.md"><img alt="GitHub: License" src="https://img.shields.io/github/license/aloisklink/flirextractor"></a>
 </p>
 
-An efficient GPLv3 Python package for extracting temperature data from FLIR IRT images.
+An efficient GPLv3-licensed Python package for extracting temperature data from FLIR IRT images.
 
 ## Differences from existing libraries
 
@@ -89,3 +89,11 @@ You can run linters with pre-commit:
 ```bash
 poetry run pre-commit run --all-files
 ```
+
+## Acknowledgements
+
+This work was supported by the
+Engineering and Physical Sciences Research Council [Doctoral Training Grant].
+
+Additionally, many thanks to Glenn J. Tattersall, for their [gtatters/Thermimage](https://github.com/gtatters/Thermimage) R package. This work uses an image and adapts part of [gtatters/Thermimage](https://github.com/gtatters/Thermimage)
+under the GPLv3.0 License.
