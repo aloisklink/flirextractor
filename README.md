@@ -87,7 +87,7 @@ poetry run pytest
 Run mypy to run type tests:
 
 ```bash
-poetry run mypy -p flirextractor
+poetry run -- mypy -p flirextractor
 ```
 
 Run isort to sort imports:

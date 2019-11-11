@@ -26,7 +26,7 @@ jobs:
         python -m poetry run isort --check-only **/*.py
     - name: Lint with flake8
       run: |
-        python -m poetry run flake8 tests/ flirextractor/ --statistics
+        python -m poetry run flake8 --statistics tests/ flirextractor/
     - name: Test with pytest
       run: |
         python -m poetry run pytest
