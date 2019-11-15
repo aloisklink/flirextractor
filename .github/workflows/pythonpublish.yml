@@ -18,6 +18,5 @@ jobs:
         python -m pip install --upgrade pip
         python -m pip install poetry
     - name: Build and publish
-      if: github.event_name == "release"
       run: |
-        python -m poetry run publish --build --username "${{ secrets.PYPI_USERNAME }}" --password "${{ secrets.PYPI_PASSWORD }}"
+        python -m poetry publish --build --username "${{ secrets.PYPI_USERNAME }}" --password "${{ secrets.PYPI_PASSWORD }}"
