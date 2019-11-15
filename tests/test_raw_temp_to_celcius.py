@@ -3,6 +3,7 @@ import typing
 import numpy as np
 import pytest
 from flirextractor.raw_temp_to_celcius import (
+    CameraPlanckConsts,
     raw_temp_to_celcius,
     water_vapor_pressure,
 )
@@ -49,11 +50,7 @@ class RawTempToCelciusInputVars(typing.NamedTuple):
     ir_window_temp: float
     ir_window_transmission: float
     humidity: float
-    planck_r1: float
-    planck_b: float
-    planck_f: float
-    planck_0: float
-    planck_r2: float
+    planck: CameraPlanckConsts
     peak_spectral_sensitivity: float
 
 
@@ -61,21 +58,21 @@ expected_raw_temp_to_celcius = {
     # data taken from first pixel of IR_2412.jpg
     RawTempToCelciusInputVars(
         raw=18090,
-        **{
-            "emissivity": 0.949999988079071,
-            "subject_distance": 1.0,
-            "reflected_temp": 19.9999938964844,
-            "atmospheric_temp": 19.9999938964844,
-            "ir_window_temp": 19.9999938964844,
-            "ir_window_transmission": 1.0,
-            "humidity": 0.5,
-            "planck_r1": 21106.76953125,
-            "planck_b": 1501.0,
-            "planck_f": 1.0,
-            "planck_0": -7340.0,
-            "planck_r2": 0.012545257806778,
-            "peak_spectral_sensitivity": 9.58537741505663,
-        },
+        emissivity=0.949999988079071,
+        subject_distance=1.0,
+        reflected_temp=19.9999938964844,
+        atmospheric_temp=19.9999938964844,
+        ir_window_temp=19.9999938964844,
+        ir_window_transmission=1.0,
+        humidity=0.5,
+        planck=CameraPlanckConsts(
+            r1=21106.76953125,
+            r2=0.012545257806778,
+            b=1501.0,
+            f=1.0,
+            zero=-7340.0,
+        ),
+        peak_spectral_sensitivity=9.58537741505663,
     ): 23.73440586671677
 }
 

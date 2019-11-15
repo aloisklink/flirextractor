@@ -11,3 +11,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix FLIR images stored in `.png` format from loading in big-endian format.
 - Updated README.md
+- Use atmospheric constants from FLIR metadata if they exist

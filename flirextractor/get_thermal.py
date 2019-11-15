@@ -11,7 +11,12 @@ from exiftool import ExifTool, fsencode  # type: ignore
 from PIL import Image  # type: ignore
 
 from .pathutils import Path, get_str_filepath
-from .raw_temp_to_celcius import raw_temp_to_celcius
+from .raw_temp_to_celcius import (
+    AtmosphericTransConsts,
+    CameraPlanckConsts,
+    raw_temp_to_celcius,
+)
+from .utils import split_dict
 
 
 def _get_tag_bytes(
@@ -77,6 +82,44 @@ def get_thermal(exiftool: ExifTool, filepath: Path) -> np.ndarray:
     return next(iter(get_thermal_batch(exiftool, filepaths)))
 
 
+atmos_exif_var_tags = dict(
+    alpha_1="AtmosphericTransAlpha1",
+    alpha_2="AtmosphericTransAlpha2",
+    beta_1="AtmosphericTransBeta1",
+    beta_2="AtmosphericTransBeta2",
+    x="AtmosphericTransX",
+)
+
+
+planck_exif_var_tags = dict(
+    r1="PlanckR1", b="PlanckB", f="PlanckF", zero="PlanckO", r2="PlanckR2",
+)
+MetadataWithConstants = typing.Dict[
+    str, typing.Union[float, CameraPlanckConsts, AtmosphericTransConsts]
+]
+
+
+def _extract_metadata_constants(
+    input_dict: typing.Mapping[str, float]
+) -> typing.Tuple[
+    CameraPlanckConsts, AtmosphericTransConsts, typing.Mapping[str, float],
+]:
+    """Extracts any constant values into their objects
+
+    Parameters:
+        input_dict: All metadata values as floats.
+
+    Returns:
+        The planck constants, the atmospheric constants,
+        nd the remaining values.
+    """
+    atmos_vars, remainder = split_dict(input_dict, atmos_exif_var_tags)
+    atmos_consts = AtmosphericTransConsts(**atmos_vars)
+    planck_vars, remainder = split_dict(remainder, planck_exif_var_tags)
+    planck_consts = CameraPlanckConsts(**planck_vars)
+    return planck_consts, atmos_consts, remainder
+
+
 exif_var_tags = dict(
     emissivity="Emissivity",
     subject_distance="SubjectDistance",
@@ -85,12 +128,9 @@ exif_var_tags = dict(
     ir_window_temp="IRWindowTemperature",
     ir_window_transmission="IRWindowTransmission",
     humidity="RelativeHumidity",
-    planck_r1="PlanckR1",
-    planck_b="PlanckB",
-    planck_f="PlanckF",
-    planck_0="PlanckO",
-    planck_r2="PlanckR2",
     peak_spectral_sensitivity="PeakSpectralSensitivity",
+    **atmos_exif_var_tags,
+    **planck_exif_var_tags,
 )
 """A mapping of Python variable names to EXIF metadata tag name"""
 _inv_exif_var_tags = {exif: py for py, exif in exif_var_tags.items()}
@@ -125,7 +165,12 @@ def convert_image(
         for mdname, val in metadata.items()
         if mdname != "SourceFile"  # exiftool also returns this for some reason
     }
-    return raw_temp_to_celcius(raw_np, **converted_metadata)
+    planck_consts, atmos_consts, remainder = _extract_metadata_constants(
+        converted_metadata
+    )
+    return raw_temp_to_celcius(
+        raw_np, planck=planck_consts, atmos_consts=atmos_consts, **remainder
+    )
 
 
 def get_thermal_batch(

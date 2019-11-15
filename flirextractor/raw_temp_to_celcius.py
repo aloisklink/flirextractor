@@ -31,8 +31,8 @@ References:
     R package, <URL: https://CRAN.R-project.org/package=Thermimage>.
 """
 
-import enum
 import math
+import typing
 
 import numpy as np  # type: ignore
 
@@ -64,12 +64,29 @@ def water_vapor_pressure(temp: float) -> float:
     )
 
 
-class ATMOSPHERIC_ATTENUATION_CONSTANTS(enum.Enum):
-    A1 = 6.569e-3
-    A2 = 12.62e-3
-    B1 = -2.276e-3
-    B2 = -6.67e-3
-    X = 1.9
+class AtmosphericTransConsts(typing.NamedTuple):
+    """Used to calculate atmospheric transmission.
+
+    Default values are taken from FLIR image metadata"""
+
+    alpha_1: float = 6.569e-3
+    alpha_2: float = 12.62e-3
+    beta_1: float = -2.276e-3
+    beta_2: float = -6.67e-3
+    x: float = 1.9
+
+
+class CameraPlanckConsts(typing.NamedTuple):
+    """Used to calculate radience from a temperature.
+
+    Based of factory calibration and are stored in FLIR image metadata.
+    """
+
+    r1: float = 21106.77
+    r2: float = 0.012545258
+    b: float = 1501
+    zero: float = -7340
+    f: float = 1
 
 
 def atmosphere_attenuation(
@@ -78,6 +95,7 @@ def atmosphere_attenuation(
     altitude: float,
     distance: float,
     peak_spectral_wavelength: float,
+    atmos_consts: AtmosphericTransConsts = AtmosphericTransConsts(),
 ) -> float:
     """Calculates the attenuation of the IR signal in atmosphere.
 
@@ -88,6 +106,7 @@ def atmosphere_attenuation(
         distance: The distance the signal moves in the atmosphere in meters.
         peak_spectral_wavelength:
             The wavelength of the peak spectral power in meters (unused).
+        atmos_trans_consts: constants taken from FLIR image metadata.
 
     References:
         Sebastian Dudzik and Waldemar Minkina's
@@ -107,19 +126,13 @@ def atmosphere_attenuation(
         return -math.sqrt(distance) * (alpha + beta * sqrt_water_pressure)
 
     exponential_1 = exponential_term(
-        alpha=ATMOSPHERIC_ATTENUATION_CONSTANTS.A1.value,
-        beta=ATMOSPHERIC_ATTENUATION_CONSTANTS.B1.value,
+        alpha=atmos_consts.alpha_1, beta=atmos_consts.beta_1,
     )
     exponential_2 = exponential_term(
-        alpha=ATMOSPHERIC_ATTENUATION_CONSTANTS.A2.value,
-        beta=ATMOSPHERIC_ATTENUATION_CONSTANTS.B2.value,
+        alpha=atmos_consts.alpha_2, beta=atmos_consts.beta_2,
     )
-    part_1 = ATMOSPHERIC_ATTENUATION_CONSTANTS.X.value * math.exp(
-        exponential_1
-    )
-    part_2 = (1 - ATMOSPHERIC_ATTENUATION_CONSTANTS.X.value) * math.exp(
-        exponential_2
-    )
+    part_1 = atmos_consts.x * math.exp(exponential_1)
+    part_2 = (1 - atmos_consts.x) * math.exp(exponential_2)
     return part_1 + part_2
 
 
@@ -132,11 +145,8 @@ def raw_temp_to_celcius(
     ir_window_temp: float = None,
     ir_window_transmission: float = 1,
     humidity: float = 0.5,
-    planck_r1: float = 21106.77,
-    planck_b: float = 1501,
-    planck_f: float = 1,
-    planck_0: float = -7340,
-    planck_r2: float = 0.012545258,
+    planck: CameraPlanckConsts = CameraPlanckConsts(),
+    atmos_consts: AtmosphericTransConsts = AtmosphericTransConsts(),
     *,  # kwargs only from now on
     peak_spectral_sensitivity: float = 9.8,  # default is 9.8 μm
 ) -> np.ndarray:
@@ -155,11 +165,8 @@ def raw_temp_to_celcius(
         ir_window_transmission:
           the ratio of IR transmitted throught the window
         humidity: relative_humidity
-        planck_r1: calibration constant
-        planck_b: calibration constant
-        planck_f: calibration constant
-        planck_0: calibration constant
-        planck_r2: calibration constant
+        planck: calibration constants
+        atmos_trans_consts: atmospheric transmission constants from metadata
         peak_spectral_sensitivity:
             wavelength of highest sensitivity in micrometers
 
@@ -201,12 +208,13 @@ def raw_temp_to_celcius(
         altitude=0,
         distance=sensor_distance_to_window,
         peak_spectral_wavelength=peak_spectral_sensitivity,
+        atmos_consts=atmos_consts,
     )
 
     def radiance(temperature: float) -> float:
         kelvin = temperature + CELCIUS_KELVIN_DIFF
-        denominator = planck_r2 * (math.exp(planck_b / kelvin) - planck_f)
-        return planck_r1 / denominator - planck_0
+        denominator = planck.r2 * (math.exp(planck.b / kelvin) - planck.f)
+        return planck.r1 / denominator - planck.zero
 
     divisor = 1.0
     # attenuated radiance reflecting off the object before the window
@@ -245,8 +253,8 @@ def raw_temp_to_celcius(
 
     raw_obj_radiance = raw / divisor - non_object_radiance
 
-    raw_object_temperature_k = planck_b / np.log(
-        planck_r1 / planck_r2 / (raw_obj_radiance + planck_0) + planck_f
+    raw_object_temperature_k = planck.b / np.log(
+        planck.r1 / planck.r2 / (raw_obj_radiance + planck.zero) + planck.f
     )
     raw_object_temperature_c = raw_object_temperature_k - CELCIUS_KELVIN_DIFF
     return raw_object_temperature_c
