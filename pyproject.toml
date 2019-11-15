@@ -1,5 +1,6 @@
 [tool.black]
 line-length = 79
+exclude = "scripts/example.py|.venv"
 
 [tool.isort]
 line-length = 79
@@ -9,11 +10,12 @@ force_grid_wrap = 0
 use_parentheses = true
 skip_glob = "*.md"
 filter_files = true
+exclude = "scripts/example.py"
 
 [tool.poetry]
 name = "flirextractor"
-version = "0.1.0"
-description = "A library from extracting temperature values from FLIR IRT Images."
+version = "0.1.1"
+description = "An efficient GPLv3-licensed Python package for extracting temperature data from FLIR IRT images."
 authors = ["Alois Klink <alois.klink@gmail.com>"]
 license = "GPL-3.0+"
 readme = "README.md"
