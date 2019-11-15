@@ -1,7 +1,6 @@
 """Used to load the thermal image from a FLIR JPG.
 
-This is based of the algorithm used in
-https://github.com/gtatters/Thermimage/blob/master/R/raw2temp.R
+Calls exiftool to extract the embedded image and metadata from the FLIR file.
 """
 import io
 import typing

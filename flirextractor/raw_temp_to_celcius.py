@@ -97,7 +97,7 @@ def atmosphere_attenuation(
     peak_spectral_wavelength: float,
     atmos_consts: AtmosphericTransConsts = AtmosphericTransConsts(),
 ) -> float:
-    """Calculates the attenuation of the IR signal in atmosphere.
+    """Calculates the transmittance of the IR signal in the atmosphere.
 
     Parameters:
         relative_humidity: The relative humidity between 0 and 1.
@@ -107,6 +107,9 @@ def atmosphere_attenuation(
         peak_spectral_wavelength:
             The wavelength of the peak spectral power in meters (unused).
         atmos_trans_consts: constants taken from FLIR image metadata.
+
+    Returns:
+        The transmittance factor of the atmosphere.
 
     References:
         Sebastian Dudzik and Waldemar Minkina's

@@ -33,7 +33,14 @@ You can install flirextractor from pip.
 pip3 install flirextractor
 ```
 
-Make sure you install exiftool as well.
+Or, using the python package manger [poetry](https://poetry.eustace.io/)
+(recommended):
+
+```bash
+poetry add flirextractor
+```
+
+**Make sure you install exiftool as well.**
 
 On RHEL, this can be installed via:
 
@@ -49,8 +56,8 @@ sudo apt update && sudo apt install libimage-exiftool-perl -y
 
 ## Usage
 
-Data is loaded in Celsius as 2-dimensional
-[`numpy.ndarray`s](https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html).
+Each FLIR infrared image is loaded in Celsius as a 2-dimensional
+[`numpy.ndarray`](https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html).
 
 To load data from a single FLIR file, run:
 
@@ -69,6 +76,23 @@ with FlirExtractor() as extractor:
     list_of_thermal_data = extractor.get_thermal_batch(
         ["path/to/FLIRimage.jpg", "path/to/another/FLIRimage.jpg"])
 ```
+
+Once you have the `numpy.ndarray`, you can export the data as a csv with:
+
+```python3
+import numpy as np
+np.savetxt("output.csv", thermal_data, delimiter=",")
+```
+
+You can display the image for debugging by doing:
+
+```python3
+from PIL import Image
+thermal_image = Image.fromarray(thermal_data)
+thermal_image.show()
+```
+
+See [./scripts/example.py](./scripts/example.py) for more example usage.
 
 ## Testing
 
@@ -96,5 +120,8 @@ This work was supported by the
 Engineering and Physical Sciences Research Council
 [Doctoral Training Partnership Grant EP/R513325/1].
 
-Additionally, many thanks to Glenn J. Tattersall, for their [gtatters/Thermimage](https://github.com/gtatters/Thermimage) R package. This work uses an image and adapts part of [gtatters/Thermimage](https://github.com/gtatters/Thermimage)
+Additionally, many thanks to Glenn J. Tattersall, for their
+[gtatters/Thermimage](https://github.com/gtatters/Thermimage) R package.
+This work uses an image and adapts part of
+[gtatters/Thermimage](https://github.com/gtatters/Thermimage)
 under the GPLv3.0 License.
