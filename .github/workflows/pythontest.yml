@@ -1,4 +1,4 @@
-name: Run tests, lints, and typechecks.
+name: Tests
 
 on: [push, pull_request]
 
