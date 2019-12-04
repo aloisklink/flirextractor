@@ -2,6 +2,7 @@
 
 <p align="center">
 <a href="https://pypi.org/project/flirextractor/"><img alt="PyPI" src="https://img.shields.io/pypi/v/flirextractor"></a>
+<a href="https://github.com/aloisklink/flirextractor/workflows/Tests/badge.svg"><img alt="GitHub Actions Status" src="https://github.com/aloisklink/flirextractor/workflows/Tests/badge.svg"></a>
 <a href="https://pypi.org/project/flirextractor/"><img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/flirextractor"></a>
 <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 <a href="https://github.com/aloisklink/flirextractor/blob/master/LICENSE.md"><img alt="GitHub: License" src="https://img.shields.io/github/license/aloisklink/flirextractor"></a>
