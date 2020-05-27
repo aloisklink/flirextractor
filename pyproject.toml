@@ -29,17 +29,17 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.6"
 pyexiftool = "^0.1.1"
-pillow = "^6.2"
+pillow = ">=6.2 <=8.0.0"
 numpy = "^1.17"
 
 [tool.poetry.dev-dependencies]
-black = {git = "https://github.com/psf/black.git", tag = "19.3b0"}
+black = {git = "https://github.com/psf/black.git", tag = "19.10b0"}
 mypy = "^0.740.0"
 flake8 = "^3.7"
 pytest = "^5.2"
 tomlkit = "^0.5.8"
 isort = "^4.3.21"
-pre-commit = "^1.20.0"
+pre-commit = "^2.0.0"
 
 [build-system]
 requires = ["poetry>=0.12"]
