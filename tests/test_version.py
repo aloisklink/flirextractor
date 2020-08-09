@@ -1,5 +1,6 @@
-import flirextractor
 import tomlkit
+
+import flirextractor
 
 
 def test_version():

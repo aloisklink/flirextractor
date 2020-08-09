@@ -2,6 +2,7 @@ import typing
 
 import numpy as np
 import pytest
+
 from flirextractor.raw_temp_to_celcius import (
     CameraPlanckConsts,
     raw_temp_to_celcius,

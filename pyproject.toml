@@ -3,14 +3,11 @@ line-length = 79
 exclude = "scripts/example.py|.venv"
 
 [tool.isort]
-line-length = 79
-multi_line_output = 3
-include_trailing_comma = true
-force_grid_wrap = 0
-use_parentheses = true
+profile = "black"
+line_length = 79
 skip_glob = "*.md"
 filter_files = true
-exclude = "scripts/example.py"
+skip = ["scripts/example.py"]
 
 [tool.poetry]
 name = "flirextractor"
@@ -33,12 +30,12 @@ pillow = ">=6.2 <=8.0.0"
 numpy = "^1.17"
 
 [tool.poetry.dev-dependencies]
-black = {git = "https://github.com/psf/black.git", tag = "19.10b0"}
-mypy = "^0.740.0"
+black = "^19.10b0"
+mypy = "^0.782"
 flake8 = "^3.7"
 pytest = "^5.2"
-tomlkit = "^0.5.8"
-isort = "^4.3.21"
+tomlkit = "^0.7.0"
+isort = "^5.0.0"
 pre-commit = "^2.0.0"
 
 [build-system]

@@ -3,6 +3,7 @@ from typing import NamedTuple, Tuple
 
 import numpy as np
 import pytest
+
 from flirextractor import FlirExtractor
 
 
