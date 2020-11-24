@@ -11,7 +11,7 @@ skip = ["scripts/example.py"]
 
 [tool.poetry]
 name = "flirextractor"
-version = "1.0.2"
+version = "1.0.3"
 description = "An efficient GPLv3-licensed Python package for extracting temperature data from FLIR IRT images."
 authors = ["Alois Klink <alois.klink@gmail.com>"]
 license = "GPL-3.0+"
@@ -39,5 +39,5 @@ isort = "^5.0.0"
 pre-commit = "^2.0.0"
 
 [build-system]
-requires = ["poetry>=0.12"]
+requires = ["poetry>=1.0"]
 build-backend = "poetry.masonry.api"

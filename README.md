@@ -126,3 +126,8 @@ Additionally, many thanks to Glenn J. Tattersall, for their
 This work uses an image and adapts part of
 [gtatters/Thermimage](https://github.com/gtatters/Thermimage)
 under the GPLv3.0 License.
+
+For testing, we use an image (`./tests/baboons.jpg`)[./tests/baboons.jpg] from
+the [flirpy](https://github.com/LJMUAstroecology/flirpy) library by
+Liverpool John Moores University's Astrophysics Research Institute
+under the MIT license.

@@ -9,6 +9,7 @@ import numpy as np  # type: ignore
 from exiftool import ExifTool, fsencode  # type: ignore
 from PIL import Image  # type: ignore
 
+from .errors import UnsupportedImageError
 from .pathutils import Path, get_str_filepath
 from .raw_temp_to_celcius import (
     AtmosphericTransConsts,
@@ -31,12 +32,21 @@ def _get_tag_bytes(
         tag: The metadata tag to load.
         filepath: The path to the file to load.
 
+    Throws:
+        UnsupportedImageError: If the given filepath does not have the tag.
+
     Returns:
         The loaded metadata for the tag in `bytes`.
     """
     params = ["-b", f"-{tag}", str(filepath)]
     params_as_bytes = map(fsencode, params)
-    return exiftool.execute(*params_as_bytes)
+    tag_bytes = exiftool.execute(*params_as_bytes)
+    if not tag_bytes:
+        raise UnsupportedImageError(
+            f"Image at {filepath} returned no bytes for the exif tag {tag}. "
+            "Are you sure this is a valid radiometric FLIR jpeg?",
+        )
+    return tag_bytes
 
 
 def _get_raw_np(exiftool: ExifTool, filepath: Path) -> np.ndarray:

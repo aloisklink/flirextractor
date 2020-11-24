@@ -5,6 +5,7 @@ import numpy as np
 import pytest
 
 from flirextractor import FlirExtractor
+from flirextractor.errors import UnsupportedImageError
 
 
 class Image(NamedTuple):
@@ -45,6 +46,11 @@ def test_get_thermal(image: AbsImage):
 
         with pytest.raises(FileNotFoundError):
             flir_extractor.get_thermal("not existant file.jpg")
+
+        with pytest.raises(UnsupportedImageError):
+            # baboons file is from https://github.com/LJMUAstroecology/flirpy/blob/master/examples/baboons.jpg
+            # and used under an MIT license.
+            flir_extractor.get_thermal("./tests/baboons.jpg")
 
         with pytest.raises(IsADirectoryError):
             flir_extractor.get_thermal(pathlib.Path(__file__).parent)
