@@ -129,10 +129,12 @@ def atmosphere_attenuation(
         return -math.sqrt(distance) * (alpha + beta * sqrt_water_pressure)
 
     exponential_1 = exponential_term(
-        alpha=atmos_consts.alpha_1, beta=atmos_consts.beta_1,
+        alpha=atmos_consts.alpha_1,
+        beta=atmos_consts.beta_1,
     )
     exponential_2 = exponential_term(
-        alpha=atmos_consts.alpha_2, beta=atmos_consts.beta_2,
+        alpha=atmos_consts.alpha_2,
+        beta=atmos_consts.beta_2,
     )
     part_1 = atmos_consts.x * math.exp(exponential_1)
     part_2 = (1 - atmos_consts.x) * math.exp(exponential_2)

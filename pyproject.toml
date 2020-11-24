@@ -30,7 +30,7 @@ pillow = ">=6.2 <=8.0.0"
 numpy = "^1.17"
 
 [tool.poetry.dev-dependencies]
-black = "^19.10b0"
+black = "^20.8b1"
 mypy = "^0.782"
 flake8 = "^3.7"
 pytest = "^5.2"

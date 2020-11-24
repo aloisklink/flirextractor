@@ -101,7 +101,11 @@ atmos_exif_var_tags = dict(
 
 
 planck_exif_var_tags = dict(
-    r1="PlanckR1", b="PlanckB", f="PlanckF", zero="PlanckO", r2="PlanckR2",
+    r1="PlanckR1",
+    b="PlanckB",
+    f="PlanckF",
+    zero="PlanckO",
+    r2="PlanckR2",
 )
 MetadataWithConstants = typing.Dict[
     str, typing.Union[float, CameraPlanckConsts, AtmosphericTransConsts]
@@ -111,7 +115,9 @@ MetadataWithConstants = typing.Dict[
 def _extract_metadata_constants(
     input_dict: typing.Mapping[str, float]
 ) -> typing.Tuple[
-    CameraPlanckConsts, AtmosphericTransConsts, typing.Mapping[str, float],
+    CameraPlanckConsts,
+    AtmosphericTransConsts,
+    typing.Mapping[str, float],
 ]:
     """Extracts any constant values into their objects
 

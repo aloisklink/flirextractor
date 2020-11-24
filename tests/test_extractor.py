@@ -48,7 +48,8 @@ def test_get_thermal(image: AbsImage):
             flir_extractor.get_thermal("not existant file.jpg")
 
         with pytest.raises(UnsupportedImageError):
-            # baboons file is from https://github.com/LJMUAstroecology/flirpy/blob/master/examples/baboons.jpg
+            # baboons file is from
+            # https://github.com/LJMUAstroecology/flirpy/blob/master/examples/baboons.jpg # noqa: E501
             # and used under an MIT license.
             flir_extractor.get_thermal("./tests/baboons.jpg")
 
